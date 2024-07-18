@@ -7,7 +7,6 @@ import dash_bootstrap_components as dbc
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import plotly.express as px
-import seaborn as sns
 import plotly.graph_objects as go
 from scipy.stats import pearsonr
 sales = pd.read_excel('AdventureWorks.xlsx', sheet_name = 'FactInternetSales')
@@ -120,7 +119,6 @@ top_products = product_sales.sort_values(by='SalesAmount', ascending=False).head
 fig_top_products = px.bar(top_products, x='ProductName', y='SalesAmount',
                           title='Top-Performing Products by Sales',
                           labels={'SalesAmount': 'Total Sales Amount', 'ProductName': 'Product Name'})
-fig_top_products.show()
 
 # Calculate total sales amount by product
 product_sales = sales.groupby('ProductName')['SalesAmount'].sum().reset_index()
@@ -141,58 +139,66 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 
 # Define the layout of the app
 app.layout = html.Div([
-    html.H1("Sales Performance Dashboard"),
-    html.Div([
-        dcc.Graph(figure=fig_kpi)
-    ], style={'width': '15%', 'height' : '20%', 'display': 'inline-block'}),
+    html.H2("433 Case"),
+    # html.Div([
+    #     dcc.Graph(figure=fig_kpi)
+    # ], style={'width': '15%', 'height' : '50%', 'display': 'inline-block'}),
 
-    
+    html.Div([
+    html.H3("Sales Charts"),
     html.Div([
         dcc.Graph(figure=fig_pie)
-    ], style={'width': '30%', 'display': 'inline-block'}),
+    ], style={'width': '40%', 'height':'50%', 'display': 'inline-block'}),
     
     html.Div([
         dcc.Graph(figure=fig_line_monthly_major)
-    ], style={'width': '30%', 'display': 'inline-block'}),
-    
+    ], style={'width': '45%', 'height':'50%','display': 'inline-block'}),
+    ]),
+    html.Div([
     html.Div([
         dcc.Graph(figure=fig_line_monthly_smaller)
-    ], style={'width': '30%', 'display': 'inline-block'}),
+    ], style={'width': '35%', 'display': 'inline-block'}),
     
     html.Div([
         dcc.Graph(figure=fig_line_yearly_major)
-    ], style={'width': '30%', 'display': 'inline-block'}),
+    ], style={'width': '35%', 'display': 'inline-block'}),
     
     html.Div([
         dcc.Graph(figure=fig_line_yearly_smaller)
     ], style={'width': '30%', 'display': 'inline-block'}),
-    
+    ]),
+    html.Div([
+
+    html.H3("Customer Charts"),
    html.Div([
         dcc.Graph(figure=age_distribution)
-    ], style={'width': '30%', 'display': 'inline-block'}),
+    ], style={'width': '35%', 'display': 'inline-block'}),
     
 
     html.Div([
         dcc.Graph(figure=income_sales_correlation)
-    ], style={'width': '30%', 'display': 'inline-block'}),
+    ], style={'width': '35%', 'display': 'inline-block'}),
     
     html.Div([
         dcc.Graph(figure=geographic_distribution)
     ], style={'width': '30%', 'display': 'inline-block'}),
-    
-    
-    
+    html.Br(),
+    ]),
+    html.Div([
+
+    html.H3("Product Charts"),
     html.Div([
         dcc.Graph(figure=fig_country_sales)
-    ], style={'width': '30%', 'display': 'inline-block'}), 
+    ], style={'width': '35%', 'display': 'inline-block'}), 
     html.Div([
         dcc.Graph(figure=fig_top_products)
     ], style={'width': '30%', 'display': 'inline-block'}), 
     html.Div([
         dcc.Graph(figure=fig_line_monthly_top_product)
     ], style={'width': '30%', 'display': 'inline-block'}), 
+    ]),
 ])
 
 # Run the app
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()
