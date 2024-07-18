@@ -101,16 +101,40 @@ geographic_distribution = px.histogram(sales, x='EnglishCountryRegionName', titl
 # Correlate demographics with sales data (example correlation plot)
 age_sales_correlation = px.scatter(sales, x='Age', y='SalesAmount', trendline='ols',
                                title='Correlation between Customer Age and Sales Amount by Gender')
-# Calculate Pearson correlation coefficient
-correlation_coefficient, _ = pearsonr(sales['Age'], sales['SalesAmount'])
-print(f"Pearson Correlation Coefficient between Age and Sales Amount: {correlation_coefficient:.2f}")
 
 
 # NO GENDER CORRELATION
-income_sales_correlation = px.scatter(sales, trendline='ols', x='YearlyIncome', y='SalesAmount')
+income_sales_correlation = px.scatter(sales, trendline='ols', trendline_color_override="red", x='YearlyIncome', y='SalesAmount', title="Correlation between Income and Sales Amount")
 # Group by country and calculate total sales amount
 country_sales = sales.groupby('EnglishCountryRegionName')['SalesAmount'].sum().reset_index()
 fig_country_sales = px.bar(country_sales, x='EnglishCountryRegionName', y='SalesAmount', title='Total Sales Amount by Country')
+
+# Q3
+# Calculate total sales amount by product
+product_sales = sales.groupby('ProductName')['SalesAmount'].sum().reset_index()
+
+# Identify top-performing products by sales
+top_products = product_sales.sort_values(by='SalesAmount', ascending=False).head(10)
+
+# Visualize top-performing products
+fig_top_products = px.bar(top_products, x='ProductName', y='SalesAmount',
+                          title='Top-Performing Products by Sales',
+                          labels={'SalesAmount': 'Total Sales Amount', 'ProductName': 'Product Name'})
+fig_top_products.show()
+
+# Calculate total sales amount by product
+product_sales = sales.groupby('ProductName')['SalesAmount'].sum().reset_index()
+
+# Identify top-performing products by sales
+top_products = product_sales.sort_values(by='SalesAmount', ascending=False).head(10)
+
+# Visualize top-performing products
+fig_top_products = px.bar(top_products, x='ProductName', y='SalesAmount',
+                          title='Top-Performing Products by Sales',
+                          labels={'SalesAmount': 'Total Sales Amount', 'ProductName': 'Product Name'})
+
+monthly_sales_top_product = sales[sales['ProductName'] == top_products['ProductName'].tolist()[0]].groupby((['YearMonth']))['SalesAmount'].sum().reset_index()
+fig_line_monthly_top_product = px.line(monthly_sales, x='YearMonth', y='SalesAmount', title='Monthly Sales Trend of BestSelling Product')
 
 load_figure_template('FLATLY')
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
@@ -145,24 +169,28 @@ app.layout = html.Div([
     
    html.Div([
         dcc.Graph(figure=age_distribution)
-    ], style={'width': '48%', 'display': 'inline-block'}),
+    ], style={'width': '30%', 'display': 'inline-block'}),
     
+
     html.Div([
-        dcc.Graph(figure=gender_distribution)
-    ], style={'width': '48%', 'display': 'inline-block'}),
+        dcc.Graph(figure=income_sales_correlation)
+    ], style={'width': '30%', 'display': 'inline-block'}),
     
     html.Div([
         dcc.Graph(figure=geographic_distribution)
-    ], style={'width': '48%', 'display': 'inline-block'}),
+    ], style={'width': '30%', 'display': 'inline-block'}),
     
     
-    html.Div([
-        dcc.Graph(figure=income_sales_correlation)
-    ], style={'width': '48%', 'display': 'inline-block'}),
     
     html.Div([
         dcc.Graph(figure=fig_country_sales)
-    ], style={'width': '48%', 'display': 'inline-block'}), 
+    ], style={'width': '30%', 'display': 'inline-block'}), 
+    html.Div([
+        dcc.Graph(figure=fig_top_products)
+    ], style={'width': '30%', 'display': 'inline-block'}), 
+    html.Div([
+        dcc.Graph(figure=fig_line_monthly_top_product)
+    ], style={'width': '30%', 'display': 'inline-block'}), 
 ])
 
 # Run the app
