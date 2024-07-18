@@ -50,10 +50,10 @@ monthly_sales_major = monthly_sales[monthly_sales['ProductCategory'] == major_ca
 monthly_sales_smaller = monthly_sales[monthly_sales['ProductCategory'].isin(smaller_categories)]
 
 # Line Chart for Monthly Sales Trends - Major Category
-fig_line_monthly_major = px.line(monthly_sales_major, x='YearMonth', y='SalesAmount', color='ProductCategory', title=f'Monthly Sales Trends - {major_category}')
-fig_line_monthly_sales = px.line(monthly_sales, x='YearMonth', y='SalesAmount')
+fig_line_monthly_major = px.line(monthly_sales_major, x='YearMonth', y='SalesAmount', color='ProductCategory', title=f'Monthly Sales Trends - {major_category}', labels={"YearMonth":"Month", "SalesAmount":"Sales Amount"})
+fig_line_monthly_sales = px.line(monthly_sales, x='YearMonth', y='SalesAmount', labels={"YearMonth":"Month", "SalesAmount":"Sales Amount"})
 # Line Chart for Monthly Sales Trends - Smaller Categories
-fig_line_monthly_smaller = px.line(monthly_sales_smaller, x='YearMonth', y='SalesAmount', color='ProductCategory', title='Monthly Sales Trends - Smaller Categories')
+fig_line_monthly_smaller = px.line(monthly_sales_smaller, x='YearMonth', y='SalesAmount', color='ProductCategory', title='Monthly Sales Trends - Smaller Categories',labels={"YearMonth":"Month", "SalesAmount":"Sales Amount"} )
 
 # Yearly Sales Trends with Category Breakdown
 sales['Year'] = sales['OrderDate'].dt.year
@@ -64,11 +64,11 @@ yearly_sales_major = yearly_sales[yearly_sales['ProductCategory'] == major_categ
 yearly_sales_smaller = yearly_sales[yearly_sales['ProductCategory'].isin(smaller_categories)]
 
 # Line Chart for Yearly Sales Trends - Major Category
-fig_line_yearly_major = px.line(yearly_sales_major, x='Year', y='SalesAmount', color='ProductCategory', title=f'Yearly Sales Trends - {major_category}')
+fig_line_yearly_major = px.line(yearly_sales_major, x='Year', y='SalesAmount', color='ProductCategory', title=f'Yearly Sales Trends - {major_category}', labels={"SalesAmount":"Sales Amount"})
 
 # Line Chart for Yearly Sales Trends - Smaller Categories
-fig_line_yearly_smaller = px.line(yearly_sales_smaller, x='Year', y='SalesAmount', color='ProductCategory', title='Yearly Sales Trends - Smaller Categories')
-fig_line_yearly_sales = px.line(yearly_sales, x='Year', y='SalesAmount')
+fig_line_yearly_smaller = px.line(yearly_sales_smaller, x='Year', y='SalesAmount', color='ProductCategory', title='Yearly Sales Trends - Smaller Categories', labels={"SalesAmount":"Sales Amount"})
+fig_line_yearly_sales = px.line(yearly_sales, x='Year', y='SalesAmount', labels={"SalesAmount":"Sales Amount"})
 
 
 # Line Chart for Sales Trends Over Time
@@ -90,12 +90,12 @@ geography = pd.read_excel('AdventureWorks.xlsx', sheet_name = 'DimGeography')
 sales = sales.merge(geography, on='GeographyKey')
 # Analyze customer demographics
 # Example: Age distribution
-age_distribution = px.histogram(sales, x='Age', title='Customer Age Distribution')
+age_distribution = px.histogram(sales, x='Age', title='Customer Age Distribution', labels={'count', "Customer Count"})
 
 # Example: Gender distribution
 gender_distribution = px.pie(sales, names='Gender', title='Customer Gender Distribution')
 # Example: Geographic distribution
-geographic_distribution = px.histogram(sales, x='EnglishCountryRegionName', title='Customer Geographic Distribution')
+geographic_distribution = px.histogram(sales, x='EnglishCountryRegionName', title='Customer Geographic Distribution', labels={'count': "Customer Count", "EnglishCountryRegionName":"Country"})
 #geographic_distribution = px.scatter_geo(sales, locations='EnglishCountryRegionName', color='EnglishCountryRegionName', title='Customer Geographic Distribution')
 # Correlate demographics with sales data (example correlation plot)
 age_sales_correlation = px.scatter(sales, x='Age', y='SalesAmount', trendline='ols',
@@ -103,10 +103,10 @@ age_sales_correlation = px.scatter(sales, x='Age', y='SalesAmount', trendline='o
 
 
 # NO GENDER CORRELATION
-income_sales_correlation = px.scatter(sales, trendline='ols', trendline_color_override="red", x='YearlyIncome', y='SalesAmount', title="Correlation between Income and Sales Amount")
+income_sales_correlation = px.scatter(sales, trendline='ols', trendline_color_override="red", x='YearlyIncome', y='SalesAmount', title="Correlation between Income and Sales Amount", labels={"YearlyIncome":"Yearly Income", "SalesAmount":"Sales Amount"})
 # Group by country and calculate total sales amount
 country_sales = sales.groupby('EnglishCountryRegionName')['SalesAmount'].sum().reset_index()
-fig_country_sales = px.bar(country_sales, x='EnglishCountryRegionName', y='SalesAmount', title='Total Sales Amount by Country')
+fig_country_sales = px.bar(country_sales, x='EnglishCountryRegionName', y='SalesAmount', title='Total Sales Amount by Country', labels={"EnglishCountryRegionName":"Country", "SalesAmount":"Sales Amount"})
 
 # Q3
 # Calculate total sales amount by product
@@ -118,7 +118,7 @@ top_products = product_sales.sort_values(by='SalesAmount', ascending=False).head
 # Visualize top-performing products
 fig_top_products = px.bar(top_products, x='ProductName', y='SalesAmount',
                           title='Top-Performing Products by Sales',
-                          labels={'SalesAmount': 'Total Sales Amount', 'ProductName': 'Product Name'})
+                          labels={'SalesAmount': 'Sales Amount', 'ProductName': 'Product Name'})
 
 # Calculate total sales amount by product
 product_sales = sales.groupby('ProductName')['SalesAmount'].sum().reset_index()
@@ -132,7 +132,7 @@ fig_top_products = px.bar(top_products, x='ProductName', y='SalesAmount',
                           labels={'SalesAmount': 'Total Sales Amount', 'ProductName': 'Product Name'})
 
 monthly_sales_top_product = sales[sales['ProductName'] == top_products['ProductName'].tolist()[0]].groupby((['YearMonth']))['SalesAmount'].sum().reset_index()
-fig_line_monthly_top_product = px.line(monthly_sales, x='YearMonth', y='SalesAmount', title='Monthly Sales Trend of BestSelling Product')
+fig_line_monthly_top_product = px.line(monthly_sales, x='YearMonth', y='SalesAmount', title='Monthly Sales Trend of BestSelling Product', labels={"YearMonth":"Month", "SalesAmount":"Sales Amount"})
 
 load_figure_template('FLATLY')
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
@@ -140,12 +140,13 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 # Define the layout of the app
 app.layout = html.Div([
     html.H2("433 Case"),
-    # html.Div([
-    #     dcc.Graph(figure=fig_kpi)
-    # ], style={'width': '15%', 'height' : '50%', 'display': 'inline-block'}),
 
     html.Div([
     html.H3("Sales Charts"),
+
+    html.Div([
+        dcc.Graph(figure=fig_kpi)
+    ], style={'width': '15%', 'height' : '50%', 'display': 'inline-block'}),
     html.Div([
         dcc.Graph(figure=fig_pie)
     ], style={'width': '40%', 'height':'50%', 'display': 'inline-block'}),
